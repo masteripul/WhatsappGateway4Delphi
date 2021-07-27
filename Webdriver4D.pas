@@ -37,6 +37,7 @@ type
     procedure ScreenShot2(var bmp: TBitmap); overload; // 有的浏览器不支持
     procedure SendKey(Key: string);
     procedure Enter;
+    function GetAttribute : String;
 
     property WebDriver: TWebDriver read FWebDriver write FWebDriver;
     property UsingName: string read FUsingName write FUsingName;
@@ -576,7 +577,7 @@ begin
   FillChar(FStartupInfo, SizeOf(FStartupInfo), 0);
   FillChar(FProcessInfo, SizeOf(FProcessInfo), 0);
   FStartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  FStartupInfo.wShowWindow := SW_HIDE;
+  FStartupInfo.wShowWindow := SW_SHOWNORMAL;
   if Args = '' then
     Command := self.BuildParams
   else
@@ -1388,7 +1389,7 @@ begin
   FillChar(FStartupInfo, SizeOf(FStartupInfo), 0);
   FillChar(FProcessInfo, SizeOf(FProcessInfo), 0);
   FStartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  FStartupInfo.wShowWindow := SW_HIDE;
+  FStartupInfo.wShowWindow := SW_SHOWNORMAL;
   if Args = '' then
     Command := self.BuildParams
   else
@@ -1534,7 +1535,7 @@ begin
   FillChar(FStartupInfo, SizeOf(FStartupInfo), 0);
   FillChar(FProcessInfo, SizeOf(FProcessInfo), 0);
   FStartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  FStartupInfo.wShowWindow := SW_HIDE;
+  FStartupInfo.wShowWindow := SW_SHOWNORMAL;
   if Args = '' then
     Command := self.BuildParams
   else
@@ -1623,15 +1624,295 @@ var
   Command: string;
   Ele: string;
   Resp: string;
+  Script: string;
 begin
   result := '';
   if WebDriver <> nil then
   begin
-    Ele := Value;
-    Command := WebDriver.Host + '/session/' + WebDriver.SessionID + '/element/'
-      + Ele + '/attribute/' + aName;
-    Resp := WebDriver.ExecuteCommand(cGet, Command);
-    result := WebDriver.ProcResponse(Resp);
+//    Ele := Value;
+//    Command := WebDriver.Host + '/session/' + WebDriver.SessionID + '/element/'
+//      + Ele + '/attribute/' + aName;
+//    Resp := WebDriver.ExecuteCommand(cGet, Command);
+//    result := WebDriver.ProcResponse(Resp);
+    Script := 'return (function() {' + #13#10 +
+    'return function() {' + #13#10 +
+        'var d = this;' + #13#10 +
+        '' + #13#10 +
+        'function f(a) {' + #13#10 +
+            'return "string" == typeof a' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function h(a, b) {' + #13#10 +
+            'this.code = a;' + #13#10 +
+            'this.a = l[a] || m;' + #13#10 +
+            'this.message = b || "";' + #13#10 +
+            'a = this.a.replace(/((?:^|\s+)[a-z])/g, function(a) {' + #13#10 +
+                'return a.toUpperCase().replace(/^[\s\xa0]+/g, "")' + #13#10 +
+            '});' + #13#10 +
+            'b = a.length - 5;' + #13#10 +
+            'if (0 > b || a.indexOf("Error", b) != b) a += "Error";' + #13#10 +
+            'this.name = a;' + #13#10 +
+            'a = Error(this.message);' + #13#10 +
+            'a.name = this.name;' + #13#10 +
+            'this.stack = a.stack || ""' + #13#10 +
+        '}' + #13#10 +
+        '(function() {' + #13#10 +
+            'var a = Error;' + #13#10 +
+            '' + #13#10 +
+            'function b() {}' + #13#10 +
+            'b.prototype = a.prototype;' + #13#10 +
+            'h.b = a.prototype;' + #13#10 +
+            'h.prototype = new b;' + #13#10 +
+            'h.prototype.constructor = h;' + #13#10 +
+            'h.a = function(b, c, g) {' + #13#10 +
+                'for (var e = Array(arguments.length - 2), k = 2; k < arguments.length; k++) e[k - 2] = arguments[k];' + #13#10 +
+                'return a.prototype[c].apply(b, e)' + #13#10 +
+            '}' + #13#10 +
+        '})();' + #13#10 +
+        'var m = "unknown error",' + #13#10 +
+            'l = {' + #13#10 +
+                '15: "element not selectable",' + #13#10 +
+                '11: "element not visible"' + #13#10 +
+            '};' + #13#10 +
+        'l[31] = m;' + #13#10 +
+        'l[30] = m;' + #13#10 +
+        'l[24] = "invalid cookie domain";' + #13#10 +
+        'l[29] = "invalid element coordinates";' + #13#10 +
+        'l[12] = "invalid element state";' + #13#10 +
+        'l[32] = "invalid selector";' + #13#10 +
+        'l[51] = "invalid selector";' + #13#10 +
+        'l[52] = "invalid selector";' + #13#10 +
+        'l[17] = "javascript error";' + #13#10 +
+        'l[405] = "unsupported operation";' + #13#10 +
+        'l[34] = "move target out of bounds";' + #13#10 +
+        'l[27] = "no such alert";' + #13#10 +
+        'l[7] = "no such element";' + #13#10 +
+        'l[8] = "no such frame";' + #13#10 +
+        'l[23] = "no such window";' + #13#10 +
+        'l[28] = "script timeout";' + #13#10 +
+        'l[33] = "session not created";' + #13#10 +
+        'l[10] = "stale element reference";' + #13#10 +
+        'l[21] = "timeout";' + #13#10 +
+        'l[25] = "unable to set cookie";' + #13#10 +
+        'l[26] = "unexpected alert open";' + #13#10 +
+        'l[13] = m;' + #13#10 +
+        'l[9] = "unknown command";' + #13#10 +
+        'h.prototype.toString = function() {' + #13#10 +
+            'return this.name + ": " + this.message' + #13#10 +
+        '};' + #13#10 +
+        'var n;' + #13#10 +
+        'a: {' + #13#10 +
+            'var p = d.navigator;' + #13#10 +
+            'if (p) {' + #13#10 +
+                'var q = p.userAgent;' + #13#10 +
+                'if (q) {' + #13#10 +
+                    'n = q;' + #13#10 +
+                    'break a' + #13#10 +
+                '}' + #13#10 +
+            '}' + #13#10 +
+            'n = ""' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function r(a) {' + #13#10 +
+            'return -1 != n.indexOf(a)' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function t(a, b) {' + #13#10 +
+            'for (var e = a.length, c = f(a) ? a.split("") : a, g = 0; g < e; g++) g in c && b.call(void 0, c[g], g, a)' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function v() {' + #13#10 +
+            'return r("iPhone") && !r("iPod") && !r("iPad")' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function w() {' + #13#10 +
+            'return (r("Chrome") || r("CriOS")) && !r("Edge")' + #13#10 +
+        '};' + #13#10 +
+        'var x = r("Opera"),' + #13#10 +
+            'y = r("Trident") || r("MSIE"),' + #13#10 +
+            'z = r("Edge"),' + #13#10 +
+            'A = r("Gecko") && !(-1 != n.toLowerCase().indexOf("webkit") && !r("Edge")) && !(r("Trident") || r("MSIE")) && !r("Edge"),' + #13#10 +
+            'aa = -1 != n.toLowerCase().indexOf("webkit") && !r("Edge");' + #13#10 +
+            '' + #13#10 +
+        'function B() {' + #13#10 +
+            'var a = d.document;' + #13#10 +
+            'return a ? a.documentMode : void 0' + #13#10 +
+        '}' + #13#10 +
+        'var C;' + #13#10 +
+        'a: {' + #13#10 +
+            'var D = "",' + #13#10 +
+                'E = function() {' + #13#10 +
+                    'var a = n;' + #13#10 +
+                    'if (A) return /rv\:([^\);]+)(\)|;)/.exec(a);' + #13#10 +
+                    'if (z) return /Edge\/([\d\.]+)/.exec(a);' + #13#10 +
+                    'if (y) return /\b(?:MSIE|rv)[: ]([^\);]+)(\)|;)/.exec(a);' + #13#10 +
+                    'if (aa) return /WebKit\/(\S+)/.exec(a);' + #13#10 +
+                    'if (x) return /(?:Version)[ \/]?(\S+)/.exec(a)' + #13#10 +
+                '}();E && (D = E ? E[1] : "");' + #13#10 +
+            'if (y) {' + #13#10 +
+                'var F = B();' + #13#10 +
+                'if (null != F && F > parseFloat(D)) {' + #13#10 +
+                    'C = String(F);' + #13#10 +
+                    'break a' + #13#10 +
+                '}' + #13#10 +
+            '}' + #13#10 +
+            'C = D' + #13#10 +
+        '}' + #13#10 +
+        'var G;' + #13#10 +
+        'var H = d.document;' + #13#10 +
+        'G = H && y ? B() || ("CSS1Compat" == H.compatMode ? parseInt(C, 10) : 5) : void 0;' + #13#10 +
+        'var ba = r("Firefox"),' + #13#10 +
+            'ca = v() || r("iPod"),' + #13#10 +
+            'da = r("iPad"),' + #13#10 +
+            'I = r("Android") && !(w() || r("Firefox") || r("Opera") || r("Silk")),' + #13#10 +
+            'ea = w(),' + #13#10 +
+            'J = r("Safari") && !(w() || r("Coast") || r("Opera") || r("Edge") || r("Silk") || r("Android")) && !(v() || r("iPad") || r("iPod"));' + #13#10 +
+            '' + #13#10 +
+        'function K(a) {' + #13#10 +
+            'return (a = a.exec(n)) ? a[1] : ""' + #13#10 +
+        '}(function() {' + #13#10 +
+            'if (ba) return K(/Firefox\/([0-9.]+)/);' + #13#10 +
+            'if (y || z || x) return C;' + #13#10 +
+            'if (ea) return v() || r("iPad") || r("iPod") ? K(/CriOS\/([0-9.]+)/) : K(/Chrome\/([0-9.]+)/);' + #13#10 +
+            'if (J && !(v() || r("iPad") || r("iPod"))) return K(/Version\/([0-9.]+)/);' + #13#10 +
+            'if (ca || da) {' + #13#10 +
+                'var a = /Version\/(\S+).*Mobile\/(\S+)/.exec(n);' + #13#10 +
+                'if (a) return a[1] + "." + a[2]' + #13#10 +
+            '} else if (I) return (a = K(/Android\s+([0-9.]+)/)) ? a : K(/Version\/([0-9.]+)/);' + #13#10 +
+            'return ""' + #13#10 +
+        '})();' + #13#10 +
+        'var L, M = function() {' + #13#10 +
+                'if (!A) return !1;' + #13#10 +
+                'var a = d.Components;' + #13#10 +
+                'if (!a) return !1;' + #13#10 +
+                'try {' + #13#10 +
+                    'if (!a.classes) return !1' + #13#10 +
+                '} catch (g) {' + #13#10 +
+                    'return !1' + #13#10 +
+                '}' + #13#10 +
+                'var b = a.classes,' + #13#10 +
+                    'a = a.interfaces,' + #13#10 +
+                    'e = b["@mozilla.org/xpcom/version-comparator;1"].getService(a.nsIVersionComparator),' + #13#10 +
+                    'c = b["@mozilla.org/xre/app-info;1"].getService(a.nsIXULAppInfo).version;' + #13#10 +
+                'L = function(a) {' + #13#10 +
+                    'e.compare(c, "" + a)' + #13#10 +
+                '};' + #13#10 +
+                'return !0' + #13#10 +
+            '}(),' + #13#10 +
+            'N = y && !(8 <= Number(G)),' + #13#10 +
+            'fa = y && !(9 <= Number(G));' + #13#10 +
+        'I && M && L(2.3);' + #13#10 +
+        'I && M && L(4);' + #13#10 +
+        'J && M && L(6);' + #13#10 +
+        'var ga = {' + #13#10 +
+                'SCRIPT: 1,' + #13#10 +
+                'STYLE: 1,' + #13#10 +
+                'HEAD: 1,' + #13#10 +
+                'IFRAME: 1,' + #13#10 +
+                'OBJECT: 1' + #13#10 +
+            '},' + #13#10 +
+            'O = {' + #13#10 +
+                'IMG: " ",' + #13#10 +
+                'BR: "\n"' + #13#10 +
+            '};' + #13#10 +
+            '' + #13#10 +
+        'function P(a, b, e) {' + #13#10 +
+            'if (!(a.nodeName in ga))' + #13#10 +
+                'if (3 == a.nodeType) e ? b.push(String(a.nodeValue).replace(/(\r\n|\r|\n)/g, "")) : b.push(a.nodeValue);' + #13#10 +
+                'else if (a.nodeName in O) b.push(O[a.nodeName]);' + #13#10 +
+            'else' + #13#10 +
+                'for (a = a.firstChild; a;) P(a, b, e), a = a.nextSibling' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function Q(a, b) {' + #13#10 +
+            'b = b.toLowerCase();' + #13#10 +
+            'return "style" == b ? ha(a.style.cssText) : N && "value" == b && R(a, "INPUT") ? a.value : fa && !0 === a[b] ? String(a.getAttribute(b)) : (a = a.getAttributeNode(b)) && a.specified ? a.value : null' + #13#10 +
+        '}' + #13#10 +
+        'var ia = /[;]+(?=(?:(?:[^"]*"){2})*[^"]*$)(?=(?:(?:[^'']*''){2})*[^'']*$)(?=(?:[^()]*\([^()]*\))*[^()]*$)/;' + #13#10 +
+        '' + #13#10 +
+        'function ha(a) {' + #13#10 +
+            'var b = [];' + #13#10 +
+            't(a.split(ia), function(a) {' + #13#10 +
+                'var c = a.indexOf(":");' + #13#10 +
+                '0 < c && (a = [a.slice(0, c), a.slice(c + 1)], 2 == a.length && b.push(a[0].toLowerCase(), ":", a[1], ";"))' + #13#10 +
+            '});' + #13#10 +
+            'b = b.join("");' + #13#10 +
+            'return b = ";" == b.charAt(b.length - 1) ? b : b + ";"' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function S(a, b) {' + #13#10 +
+            'N && "value" == b && R(a, "OPTION") && null === Q(a, "value") ? (b = [], P(a, b, !1), a = b.join("")) : a = a[b];' + #13#10 +
+            'return a' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function R(a, b) {' + #13#10 +
+            'b && "string" !== typeof b && (b = b.toString());' + #13#10 +
+            'return !!a && 1 == a.nodeType && (!b || a.tagName.toUpperCase() == b)' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function T(a) {' + #13#10 +
+            'return R(a, "OPTION") ? !0 : R(a, "INPUT") ? (a = a.type.toLowerCase(), "checkbox" == a || "radio" == a) : !1' + #13#10 +
+        '};' + #13#10 +
+        'var ja = {' + #13#10 +
+                '"class": "className",' + #13#10 +
+                'readonly: "readOnly"' + #13#10 +
+            '},' + #13#10 +
+            'U = "allowfullscreen allowpaymentrequest allowusermedia async autofocus autoplay checked compact complete controls declare default defaultchecked defaultselected defer disabled ended formnovalidate hidden indeterminate iscontenteditable i' + 'smap itemscope loop multiple muted nohref nomodule noresize noshade novalidate nowrap open paused playsinline pubdate readonly required reversed scoped seamless seeking selected truespeed typemustmatch willvalidate".split(" ");' + #13#10 +
+            '' + #13#10 +
+        'function V(a, b) {' + #13#10 +
+            'var e = null,' + #13#10 +
+                'c = b.toLowerCase();' + #13#10 +
+            'if ("style" == c) return (e = a.style) && !f(e) && (e = e.cssText), e;' + #13#10 +
+            'if (("selected" == c || "checked" == c) && T(a)) {' + #13#10 +
+                'if (!T(a)) throw new h(15, "Element is not selectable");' + #13#10 +
+                'b = "selected";' + #13#10 +
+                'e = a.type && a.type.toLowerCase();' + #13#10 +
+                'if ("checkbox" == e || "radio" == e) b = "checked";' + #13#10 +
+                'return S(a, b) ? "true" : null' + #13#10 +
+            '}' + #13#10 +
+            'var g = R(a, "A");' + #13#10 +
+            'if (R(a, "IMG") && "src" == c || g && "href" == c) return (e = Q(a, c)) && (e = S(a, c)), e;' + #13#10 +
+            'if ("spellcheck" == c) {' + #13#10 +
+                'e = Q(a, c);' + #13#10 +
+                'if (null !== e) {' + #13#10 +
+                    'if ("false" == e.toLowerCase()) return "false";' + #13#10 +
+                    'if ("true" == e.toLowerCase()) return "true"' + #13#10 +
+                '}' + #13#10 +
+                'return S(a,' + #13#10 +
+                    'c) + ""' + #13#10 +
+            '}' + #13#10 +
+            'g = ja[b] || b;' + #13#10 +
+            'a: if (f(U)) c = f(c) && 1 == c.length ? U.indexOf(c, 0) : -1;' + #13#10 +
+                'else {' + #13#10 +
+                    'for (var u = 0; u < U.length; u++)' + #13#10 +
+                        'if (u in U && U[u] === c) {' + #13#10 +
+                            'c = u;' + #13#10 +
+                            'break a' + #13#10 +
+                        '} c = -1' + #13#10 +
+                '}' + #13#10 +
+            'if (0 <= c) return (e = null !== Q(a, b) || S(a, g)) ? "true" : null;' + #13#10 +
+            'try {' + #13#10 +
+                'var k = S(a, g)' + #13#10 +
+            '} catch (ka) {}(c = null == k) || (c = typeof k, c = "object" == c && null != k || "function" == c);' + #13#10 +
+            'c ? e = Q(a, b) : e = k;' + #13#10 +
+            'return null != e ? e.toString() : null' + #13#10 +
+        '}' + #13#10 +
+        'var W = ["_"],' + #13#10 +
+            'X = d;' + #13#10 +
+        'W[0] in X || !X.execScript || X.execScript("var " + W[0]);' + #13#10 +
+        'for (var Y; W.length && (Y = W.shift());) {' + #13#10 +
+            'var Z;' + #13#10 +
+            'if (Z = !W.length) Z = void 0 !== V;' + #13#10 +
+            'Z ? X[Y] = V : X[Y] && X[Y] !== Object.prototype[Y] ? X = X[Y] : X = X[Y] = {}' + #13#10 +
+        '};;' + #13#10 +
+        'return this._.apply(null, arguments);' + #13#10 +
+    '}.apply({' + #13#10 +
+        'navigator: typeof window != ''undefined'' ? window.navigator : null,' + #13#10 +
+        'document: typeof window != ''undefined'' ? window.document : null' + #13#10 +
+    '}, arguments);' + #13#10 +
+    '}).apply(null, arguments);';
+
+    Result := WebDriver.ExecuteScript(Script,'['+ElementData+',"'+aName+'"]')
   end;
 end;
 
@@ -1888,6 +2169,321 @@ begin
   end;
   Resp := WebDriver.ExecuteCommand(cPost, Command, Data);
   WebDriver.ProcResponse(Resp);
+end;
+
+function TWebElement.GetAttribute : String;
+var
+  Command: string;
+  Data: string;
+  Resp: string;
+  KeyArr: string;
+  I: Integer;
+  FJson: TJsonObject;
+  Key: string;
+  A,B,C: WideChar;
+  Script: String;
+begin
+  Script := 'return (function() {' + #13#10 +
+    'return function() {' + #13#10 +
+        'var d = this;' + #13#10 +
+        '' + #13#10 +
+        'function f(a) {' + #13#10 +
+            'return "string" == typeof a' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function h(a, b) {' + #13#10 +
+            'this.code = a;' + #13#10 +
+            'this.a = l[a] || m;' + #13#10 +
+            'this.message = b || "";' + #13#10 +
+            'a = this.a.replace(/((?:^|\s+)[a-z])/g, function(a) {' + #13#10 +
+                'return a.toUpperCase().replace(/^[\s\xa0]+/g, "")' + #13#10 +
+            '});' + #13#10 +
+            'b = a.length - 5;' + #13#10 +
+            'if (0 > b || a.indexOf("Error", b) != b) a += "Error";' + #13#10 +
+            'this.name = a;' + #13#10 +
+            'a = Error(this.message);' + #13#10 +
+            'a.name = this.name;' + #13#10 +
+            'this.stack = a.stack || ""' + #13#10 +
+        '}' + #13#10 +
+        '(function() {' + #13#10 +
+            'var a = Error;' + #13#10 +
+            '' + #13#10 +
+            'function b() {}' + #13#10 +
+            'b.prototype = a.prototype;' + #13#10 +
+            'h.b = a.prototype;' + #13#10 +
+            'h.prototype = new b;' + #13#10 +
+            'h.prototype.constructor = h;' + #13#10 +
+            'h.a = function(b, c, g) {' + #13#10 +
+                'for (var e = Array(arguments.length - 2), k = 2; k < arguments.length; k++) e[k - 2] = arguments[k];' + #13#10 +
+                'return a.prototype[c].apply(b, e)' + #13#10 +
+            '}' + #13#10 +
+        '})();' + #13#10 +
+        'var m = "unknown error",' + #13#10 +
+            'l = {' + #13#10 +
+                '15: "element not selectable",' + #13#10 +
+                '11: "element not visible"' + #13#10 +
+            '};' + #13#10 +
+        'l[31] = m;' + #13#10 +
+        'l[30] = m;' + #13#10 +
+        'l[24] = "invalid cookie domain";' + #13#10 +
+        'l[29] = "invalid element coordinates";' + #13#10 +
+        'l[12] = "invalid element state";' + #13#10 +
+        'l[32] = "invalid selector";' + #13#10 +
+        'l[51] = "invalid selector";' + #13#10 +
+        'l[52] = "invalid selector";' + #13#10 +
+        'l[17] = "javascript error";' + #13#10 +
+        'l[405] = "unsupported operation";' + #13#10 +
+        'l[34] = "move target out of bounds";' + #13#10 +
+        'l[27] = "no such alert";' + #13#10 +
+        'l[7] = "no such element";' + #13#10 +
+        'l[8] = "no such frame";' + #13#10 +
+        'l[23] = "no such window";' + #13#10 +
+        'l[28] = "script timeout";' + #13#10 +
+        'l[33] = "session not created";' + #13#10 +
+        'l[10] = "stale element reference";' + #13#10 +
+        'l[21] = "timeout";' + #13#10 +
+        'l[25] = "unable to set cookie";' + #13#10 +
+        'l[26] = "unexpected alert open";' + #13#10 +
+        'l[13] = m;' + #13#10 +
+        'l[9] = "unknown command";' + #13#10 +
+        'h.prototype.toString = function() {' + #13#10 +
+            'return this.name + ": " + this.message' + #13#10 +
+        '};' + #13#10 +
+        'var n;' + #13#10 +
+        'a: {' + #13#10 +
+            'var p = d.navigator;' + #13#10 +
+            'if (p) {' + #13#10 +
+                'var q = p.userAgent;' + #13#10 +
+                'if (q) {' + #13#10 +
+                    'n = q;' + #13#10 +
+                    'break a' + #13#10 +
+                '}' + #13#10 +
+            '}' + #13#10 +
+            'n = ""' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function r(a) {' + #13#10 +
+            'return -1 != n.indexOf(a)' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function t(a, b) {' + #13#10 +
+            'for (var e = a.length, c = f(a) ? a.split("") : a, g = 0; g < e; g++) g in c && b.call(void 0, c[g], g, a)' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function v() {' + #13#10 +
+            'return r("iPhone") && !r("iPod") && !r("iPad")' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function w() {' + #13#10 +
+            'return (r("Chrome") || r("CriOS")) && !r("Edge")' + #13#10 +
+        '};' + #13#10 +
+        'var x = r("Opera"),' + #13#10 +
+            'y = r("Trident") || r("MSIE"),' + #13#10 +
+            'z = r("Edge"),' + #13#10 +
+            'A = r("Gecko") && !(-1 != n.toLowerCase().indexOf("webkit") && !r("Edge")) && !(r("Trident") || r("MSIE")) && !r("Edge"),' + #13#10 +
+            'aa = -1 != n.toLowerCase().indexOf("webkit") && !r("Edge");' + #13#10 +
+            '' + #13#10 +
+        'function B() {' + #13#10 +
+            'var a = d.document;' + #13#10 +
+            'return a ? a.documentMode : void 0' + #13#10 +
+        '}' + #13#10 +
+        'var C;' + #13#10 +
+        'a: {' + #13#10 +
+            'var D = "",' + #13#10 +
+                'E = function() {' + #13#10 +
+                    'var a = n;' + #13#10 +
+                    'if (A) return /rv\:([^\);]+)(\)|;)/.exec(a);' + #13#10 +
+                    'if (z) return /Edge\/([\d\.]+)/.exec(a);' + #13#10 +
+                    'if (y) return /\b(?:MSIE|rv)[: ]([^\);]+)(\)|;)/.exec(a);' + #13#10 +
+                    'if (aa) return /WebKit\/(\S+)/.exec(a);' + #13#10 +
+                    'if (x) return /(?:Version)[ \/]?(\S+)/.exec(a)' + #13#10 +
+                '}();E && (D = E ? E[1] : "");' + #13#10 +
+            'if (y) {' + #13#10 +
+                'var F = B();' + #13#10 +
+                'if (null != F && F > parseFloat(D)) {' + #13#10 +
+                    'C = String(F);' + #13#10 +
+                    'break a' + #13#10 +
+                '}' + #13#10 +
+            '}' + #13#10 +
+            'C = D' + #13#10 +
+        '}' + #13#10 +
+        'var G;' + #13#10 +
+        'var H = d.document;' + #13#10 +
+        'G = H && y ? B() || ("CSS1Compat" == H.compatMode ? parseInt(C, 10) : 5) : void 0;' + #13#10 +
+        'var ba = r("Firefox"),' + #13#10 +
+            'ca = v() || r("iPod"),' + #13#10 +
+            'da = r("iPad"),' + #13#10 +
+            'I = r("Android") && !(w() || r("Firefox") || r("Opera") || r("Silk")),' + #13#10 +
+            'ea = w(),' + #13#10 +
+            'J = r("Safari") && !(w() || r("Coast") || r("Opera") || r("Edge") || r("Silk") || r("Android")) && !(v() || r("iPad") || r("iPod"));' + #13#10 +
+            '' + #13#10 +
+        'function K(a) {' + #13#10 +
+            'return (a = a.exec(n)) ? a[1] : ""' + #13#10 +
+        '}(function() {' + #13#10 +
+            'if (ba) return K(/Firefox\/([0-9.]+)/);' + #13#10 +
+            'if (y || z || x) return C;' + #13#10 +
+            'if (ea) return v() || r("iPad") || r("iPod") ? K(/CriOS\/([0-9.]+)/) : K(/Chrome\/([0-9.]+)/);' + #13#10 +
+            'if (J && !(v() || r("iPad") || r("iPod"))) return K(/Version\/([0-9.]+)/);' + #13#10 +
+            'if (ca || da) {' + #13#10 +
+                'var a = /Version\/(\S+).*Mobile\/(\S+)/.exec(n);' + #13#10 +
+                'if (a) return a[1] + "." + a[2]' + #13#10 +
+            '} else if (I) return (a = K(/Android\s+([0-9.]+)/)) ? a : K(/Version\/([0-9.]+)/);' + #13#10 +
+            'return ""' + #13#10 +
+        '})();' + #13#10 +
+        'var L, M = function() {' + #13#10 +
+                'if (!A) return !1;' + #13#10 +
+                'var a = d.Components;' + #13#10 +
+                'if (!a) return !1;' + #13#10 +
+                'try {' + #13#10 +
+                    'if (!a.classes) return !1' + #13#10 +
+                '} catch (g) {' + #13#10 +
+                    'return !1' + #13#10 +
+                '}' + #13#10 +
+                'var b = a.classes,' + #13#10 +
+                    'a = a.interfaces,' + #13#10 +
+                    'e = b["@mozilla.org/xpcom/version-comparator;1"].getService(a.nsIVersionComparator),' + #13#10 +
+                    'c = b["@mozilla.org/xre/app-info;1"].getService(a.nsIXULAppInfo).version;' + #13#10 +
+                'L = function(a) {' + #13#10 +
+                    'e.compare(c, "" + a)' + #13#10 +
+                '};' + #13#10 +
+                'return !0' + #13#10 +
+            '}(),' + #13#10 +
+            'N = y && !(8 <= Number(G)),' + #13#10 +
+            'fa = y && !(9 <= Number(G));' + #13#10 +
+        'I && M && L(2.3);' + #13#10 +
+        'I && M && L(4);' + #13#10 +
+        'J && M && L(6);' + #13#10 +
+        'var ga = {' + #13#10 +
+                'SCRIPT: 1,' + #13#10 +
+                'STYLE: 1,' + #13#10 +
+                'HEAD: 1,' + #13#10 +
+                'IFRAME: 1,' + #13#10 +
+                'OBJECT: 1' + #13#10 +
+            '},' + #13#10 +
+            'O = {' + #13#10 +
+                'IMG: " ",' + #13#10 +
+                'BR: "\n"' + #13#10 +
+            '};' + #13#10 +
+            '' + #13#10 +
+        'function P(a, b, e) {' + #13#10 +
+            'if (!(a.nodeName in ga))' + #13#10 +
+                'if (3 == a.nodeType) e ? b.push(String(a.nodeValue).replace(/(\r\n|\r|\n)/g, "")) : b.push(a.nodeValue);' + #13#10 +
+                'else if (a.nodeName in O) b.push(O[a.nodeName]);' + #13#10 +
+            'else' + #13#10 +
+                'for (a = a.firstChild; a;) P(a, b, e), a = a.nextSibling' + #13#10 +
+        '};' + #13#10 +
+        '' + #13#10 +
+        'function Q(a, b) {' + #13#10 +
+            'b = b.toLowerCase();' + #13#10 +
+            'return "style" == b ? ha(a.style.cssText) : N && "value" == b && R(a, "INPUT") ? a.value : fa && !0 === a[b] ? String(a.getAttribute(b)) : (a = a.getAttributeNode(b)) && a.specified ? a.value : null' + #13#10 +
+        '}' + #13#10 +
+        'var ia = /[;]+(?=(?:(?:[^"]*"){2})*[^"]*$)(?=(?:(?:[^'']*''){2})*[^'']*$)(?=(?:[^()]*\([^()]*\))*[^()]*$)/;' + #13#10 +
+        '' + #13#10 +
+        'function ha(a) {' + #13#10 +
+            'var b = [];' + #13#10 +
+            't(a.split(ia), function(a) {' + #13#10 +
+                'var c = a.indexOf(":");' + #13#10 +
+                '0 < c && (a = [a.slice(0, c), a.slice(c + 1)], 2 == a.length && b.push(a[0].toLowerCase(), ":", a[1], ";"))' + #13#10 +
+            '});' + #13#10 +
+            'b = b.join("");' + #13#10 +
+            'return b = ";" == b.charAt(b.length - 1) ? b : b + ";"' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function S(a, b) {' + #13#10 +
+            'N && "value" == b && R(a, "OPTION") && null === Q(a, "value") ? (b = [], P(a, b, !1), a = b.join("")) : a = a[b];' + #13#10 +
+            'return a' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function R(a, b) {' + #13#10 +
+            'b && "string" !== typeof b && (b = b.toString());' + #13#10 +
+            'return !!a && 1 == a.nodeType && (!b || a.tagName.toUpperCase() == b)' + #13#10 +
+        '}' + #13#10 +
+        '' + #13#10 +
+        'function T(a) {' + #13#10 +
+            'return R(a, "OPTION") ? !0 : R(a, "INPUT") ? (a = a.type.toLowerCase(), "checkbox" == a || "radio" == a) : !1' + #13#10 +
+        '};' + #13#10 +
+        'var ja = {' + #13#10 +
+                '"class": "className",' + #13#10 +
+                'readonly: "readOnly"' + #13#10 +
+            '},' + #13#10 +
+            'U = "allowfullscreen allowpaymentrequest allowusermedia async autofocus autoplay checked compact complete controls declare default defaultchecked defaultselected defer disabled ended formnovalidate hidden indeterminate iscontenteditable i' + 'smap itemscope loop multiple muted nohref nomodule noresize noshade novalidate nowrap open paused playsinline pubdate readonly required reversed scoped seamless seeking selected truespeed typemustmatch willvalidate".split(" ");' + #13#10 +
+            '' + #13#10 +
+        'function V(a, b) {' + #13#10 +
+            'var e = null,' + #13#10 +
+                'c = b.toLowerCase();' + #13#10 +
+            'if ("style" == c) return (e = a.style) && !f(e) && (e = e.cssText), e;' + #13#10 +
+            'if (("selected" == c || "checked" == c) && T(a)) {' + #13#10 +
+                'if (!T(a)) throw new h(15, "Element is not selectable");' + #13#10 +
+                'b = "selected";' + #13#10 +
+                'e = a.type && a.type.toLowerCase();' + #13#10 +
+                'if ("checkbox" == e || "radio" == e) b = "checked";' + #13#10 +
+                'return S(a, b) ? "true" : null' + #13#10 +
+            '}' + #13#10 +
+            'var g = R(a, "A");' + #13#10 +
+            'if (R(a, "IMG") && "src" == c || g && "href" == c) return (e = Q(a, c)) && (e = S(a, c)), e;' + #13#10 +
+            'if ("spellcheck" == c) {' + #13#10 +
+                'e = Q(a, c);' + #13#10 +
+                'if (null !== e) {' + #13#10 +
+                    'if ("false" == e.toLowerCase()) return "false";' + #13#10 +
+                    'if ("true" == e.toLowerCase()) return "true"' + #13#10 +
+                '}' + #13#10 +
+                'return S(a,' + #13#10 +
+                    'c) + ""' + #13#10 +
+            '}' + #13#10 +
+            'g = ja[b] || b;' + #13#10 +
+            'a: if (f(U)) c = f(c) && 1 == c.length ? U.indexOf(c, 0) : -1;' + #13#10 +
+                'else {' + #13#10 +
+                    'for (var u = 0; u < U.length; u++)' + #13#10 +
+                        'if (u in U && U[u] === c) {' + #13#10 +
+                            'c = u;' + #13#10 +
+                            'break a' + #13#10 +
+                        '} c = -1' + #13#10 +
+                '}' + #13#10 +
+            'if (0 <= c) return (e = null !== Q(a, b) || S(a, g)) ? "true" : null;' + #13#10 +
+            'try {' + #13#10 +
+                'var k = S(a, g)' + #13#10 +
+            '} catch (ka) {}(c = null == k) || (c = typeof k, c = "object" == c && null != k || "function" == c);' + #13#10 +
+            'c ? e = Q(a, b) : e = k;' + #13#10 +
+            'return null != e ? e.toString() : null' + #13#10 +
+        '}' + #13#10 +
+        'var W = ["_"],' + #13#10 +
+            'X = d;' + #13#10 +
+        'W[0] in X || !X.execScript || X.execScript("var " + W[0]);' + #13#10 +
+        'for (var Y; W.length && (Y = W.shift());) {' + #13#10 +
+            'var Z;' + #13#10 +
+            'if (Z = !W.length) Z = void 0 !== V;' + #13#10 +
+            'Z ? X[Y] = V : X[Y] && X[Y] !== Object.prototype[Y] ? X = X[Y] : X = X[Y] = {}' + #13#10 +
+        '};;' + #13#10 +
+        'return this._.apply(null, arguments);' + #13#10 +
+    '}.apply({' + #13#10 +
+        'navigator: typeof window != ''undefined'' ? window.navigator : null,' + #13#10 +
+        'document: typeof window != ''undefined'' ? window.document : null' + #13#10 +
+    '}, arguments);' + #13#10 +
+    '}).apply(null, arguments);';
+
+    //Script := ElementData;
+
+    Result := WebDriver.ExecuteScript(Script,'['+ElementData+',"innerHTML"]')
+
+//  Command := WebDriver.Host + '/session/' + WebDriver.SessionID + '/element/' + Value + '/value';
+//  FJson := TJsonObject.Create;
+//  try
+//
+//    A := #$E007;
+//    Data := '{"value":["'+A+'"]}';
+//    //Data := '{"value":["\u0007"]}';
+//
+////    KeyArr := '[' +A+ ']';
+////
+////    FJson.A['value'].FromJSON(KeyArr);
+////    Data := FJson.ToJSON();
+//
+//    Data := '{"text":"'+A+'","id":"'+Value+'"}';
+//  finally
+//    FJson.Free;
+//  end;
+//  Resp := WebDriver.ExecuteCommand(cPost, Command, Data);
+//  WebDriver.ProcResponse(Resp);
 end;
 
 function TWebElement.GetSize: string;

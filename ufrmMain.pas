@@ -4,7 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Webdriver4D, iniFiles;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Webdriver4D, iniFiles,
+  Vcl.ExtDlgs;
 
 type
   TfrmMain = class(TForm)
@@ -21,6 +22,10 @@ type
     Edit1: TEdit;
     Label7: TLabel;
     Edit2: TEdit;
+    Label1: TLabel;
+    Edit3: TEdit;
+    OpenPictureDialog1: TOpenPictureDialog;
+    Button1: TButton;
     procedure Button2Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure Button3Click(Sender: TObject);
@@ -28,11 +33,15 @@ type
     procedure FormCreate(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
     function CreateWebDriver: TWebDriver;
     procedure Delay(ADelay: Integer);
     procedure KirimPesan;
+    procedure GetDataInputSearchXPath;
+    procedure GetDataInputMessageXPath;
+    procedure TypeMessage(Msg: string);
   public
     { Public declarations }
   end;
@@ -45,9 +54,58 @@ var
   FWD: TWebDriver;
   ShowAwal: Boolean;
 
+  DataInputSearchXPath: String;
+  DataInputMessageXPath: string;
+
 implementation
 
 {$R *.dfm}
+
+procedure TfrmMain.GetDataInputSearchXPath;
+var
+  StrBuff,
+  StrBuff1,
+  StrBuff2:String;
+begin
+  if DataInputSearchXPath = '' then begin
+    StrBuff := FWD.GetDocument;
+    if Pos('Search or start new chat',StrBuff) <> 0 then begin
+      StrBuff := Copy(StrBuff,Pos('Search or start new chat',StrBuff),MaxInt);
+      StrBuff := Copy(StrBuff,Pos('copyable-text selectable-text',StrBuff)-50,MaxInt);
+      StrBuff   := Copy(StrBuff,Pos('class="',StrBuff)+7,maxint);
+      StrBuff1  := Copy(StrBuff,1,Pos('"',StrBuff)-1);
+      StrBuff   := Copy(StrBuff,Pos('data-tab="',StrBuff)+10,maxint);
+      StrBuff2  := Copy(StrBuff,1,Pos('"',StrBuff)-1);
+      if (StrBuff1 <> '') and (StrBuff2 <> '') then begin
+        DataInputSearchXPath  := '//*[@class='''+StrBuff1+''' and @data-tab='''+StrBuff2+''']';
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.GetDataInputMessageXPath;
+var
+  StrBuff,
+  StrBuff1,
+  StrBuff2:String;
+  FcurElement: TWebElement;
+begin
+  if DataInputMessageXPath = '' then begin
+    FcurElement := FWd.FindElementByXPath('//footer[contains(@tabindex,''-1'')]');
+    if not FcurElement.IsEmpty then begin
+      StrBuff   := FcurElement.AttributeValue('innerHTML');
+      StrBuff   := Copy(StrBuff,Pos('Search or start new chat',StrBuff),MaxInt);
+      StrBuff   := Copy(StrBuff,Pos('copyable-text selectable-text',StrBuff)-50,MaxInt);
+      StrBuff   := Copy(StrBuff,Pos('class="',StrBuff)+7,maxint);
+      StrBuff1  := Copy(StrBuff,1,Pos('"',StrBuff)-1);
+      StrBuff   := Copy(StrBuff,Pos('data-tab="',StrBuff)+10,maxint);
+      StrBuff2  := Copy(StrBuff,1,Pos('"',StrBuff)-1);
+      if (StrBuff1 <> '') and (StrBuff2 <> '') then begin
+        DataInputMessageXPath  := '//*[@class='''+StrBuff1+''' and @data-tab='''+StrBuff2+''']';
+      end;
+    end;
+  end;
+end;
 
 procedure TfrmMain.Timer2Timer(Sender: TObject);
 var
@@ -69,6 +127,7 @@ begin
     lst.LineBreak := 'tabindex="-1"';
     lst.Text      := FcurElement.AttributeValue('innerHTML');
     //memLog.Text   := FcurElement.AttributeValue('innerHTML');
+    //lst.Text      := FcurElement.GetAttribute;
 
     for i := 2 to lst.Count-1 do begin
       Pesan     := '';
@@ -118,10 +177,17 @@ begin
 
       // click posisi pesan
       if StatusPesan <> '' then begin
-        FcurElement := FWd.FindElementByXPath('//*[@title=''_2_1wd copyable-text selectable-text'' or @data-tab=''3'']');
+        GetDataInputSearchXPath;
+        FcurElement := FWd.FindElementByXPath(DataInputSearchXPath);
         if not FcurElement.IsEmpty then begin
           FcurElement.SendKey(Pengirim);
           FcurElement.Enter;
+
+          Memo1.Lines.Add('-- New Message --');
+          Memo1.Lines.Add('Number: '+Pengirim);
+          Memo1.Lines.Add('Time: '+Waktu);
+          Memo1.Lines.Add('Message: '+Pesan);
+          Memo1.Lines.Add('');
         end;
       end;
     end;
@@ -135,13 +201,63 @@ begin
   Timer2.Enabled := True;
 end;
 
+procedure TfrmMain.TypeMessage(Msg: string);
+var
+  CapsOn: boolean;
+  i: integer;
+  ch: char;
+  shift: boolean;
+  key: short;
+begin
+  CapsOn := (GetKeyState( VK_CAPITAL ) and $1) <> 0;
+
+  for i:=1 to length(Msg) do
+  begin
+    ch := Msg[i];
+    ch := UpCase(ch);
+
+    if ch <> Msg[i] then
+    begin
+      if CapsOn then
+      begin
+        keybd_event( VK_SHIFT, 0, 0, 0 );
+      end;
+      keybd_event( ord(ch), 0, 0, 0 );
+      keybd_event( ord(ch), 0, KEYEVENTF_KEYUP, 0 );
+      if CapsOn then
+      begin
+        keybd_event( VK_SHIFT, 0, KEYEVENTF_KEYUP, 0 );
+      end;
+    end
+    else
+    begin
+      key := VKKeyScan( ch );
+      // UpperCase
+      if ((not CapsOn) and (ch>='A') and (ch <= 'Z')) or
+         ((key and $100) > 0) then
+      begin
+        keybd_event( VK_SHIFT, 0, 0, 0 );
+      end;
+      keybd_event( key, 0, 0, 0 );
+      keybd_event( key, 0, KEYEVENTF_KEYUP, 0 );
+      if ((not CapsOn) and (ch>='A') and (ch <= 'Z')) or
+         ((key and $100) > 0) then
+      begin
+        keybd_event( VK_SHIFT, 0, KEYEVENTF_KEYUP, 0 );
+      end;
+    end;
+  end;
+end;
+
 procedure TfrmMain.KirimPesan;
 var
   FcurElement: TWebElement;
+  notepad: HWND;
 begin
   if StatusKirim then begin
 
-    FcurElement := FWd.FindElementByXPath('//*[@title=''_2_1wd copyable-text selectable-text'' or @data-tab=''3'']');
+    GetDataInputSearchXPath;
+    FcurElement := FWd.FindElementByXPath(DataInputSearchXPath);
     if not FcurElement.IsEmpty then begin
       FcurElement.SendKey(Edit1.Text);
       FcurElement.Enter;
@@ -149,13 +265,72 @@ begin
 
     Delay(1000);
 
-    FcurElement := FWd.FindElementByXPath('//*[@title=''_2_1wd copyable-text selectable-text'' or @data-tab=''6'']');
-    if not FcurElement.IsEmpty then begin
-      FcurElement.SendKey(Edit2.Text);
-      FcurElement.Enter;
+    if Edit3.Text <> '' then begin
+      FcurElement := FWd.FindElementByXPath('//*[@data-testid=''clip'' and @data-icon=''clip'']');
+      if not FcurElement.IsEmpty then begin
+        FcurElement.Click;
+      end;
+
+      Delay(1000);
+
+      FcurElement := FWd.FindElementByXPath('//*[@data-testid=''attach-image'' and @data-icon=''attach-image'']');
+      if not FcurElement.IsEmpty then begin
+        FcurElement.Click;
+      end;
+
+      Delay(1000);
+
+      TypeMessage(Edit3.Text+#13);
+
+      Delay(1000);
+
+      GetDataInputMessageXPath;
+      FcurElement := FWd.FindElementByXPath(DataInputMessageXPath);
+      if not FcurElement.IsEmpty then begin
+        FcurElement.SendKey(Edit2.Text);
+        //FcurElement.Enter;
+      end;
+
+      FcurElement := FWd.FindElementByXPath('//*[@data-testid=''send'' and @data-icon=''send'']');
+      if not FcurElement.IsEmpty then begin
+        FcurElement.Click;
+      end;
+
+      Memo1.Lines.Add('-- Send Image --');
+      Memo1.Lines.Add('Number: '+Edit1.Text);
+      Memo1.Lines.Add('Time: '+FormatDateTime('hh:nn',Now));
+      Memo1.Lines.Add('Message: '+Edit2.Text);
+      Memo1.Lines.Add('Image: '+Edit3.Text);
+      Memo1.Lines.Add('');
+    end
+    else begin
+      GetDataInputMessageXPath;
+      FcurElement := FWd.FindElementByXPath(DataInputMessageXPath);
+      if not FcurElement.IsEmpty then begin
+        FcurElement.SendKey(Edit2.Text);
+        FcurElement.Enter;
+      end;
+
+      Memo1.Lines.Add('-- Send Message --');
+      Memo1.Lines.Add('Number: '+Edit1.Text);
+      Memo1.Lines.Add('Time: '+FormatDateTime('hh:nn',Now));
+      Memo1.Lines.Add('Message: '+Edit2.Text);
+      Memo1.Lines.Add('');
     end;
 
     StatusKirim := False;
+  end;
+end;
+
+procedure TfrmMain.Button1Click(Sender: TObject);
+begin
+  OpenPictureDialog1.Filter := 'All (*.gif;*.png;*.jpg;*.jpeg;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff)|*.gif;*.png;*.jpg;*.'+
+                               'jpeg;*.bmp;*.ico;*.emf;*.wmf;*.tif;*.tiff|GIF Image (*.gif)|*.gif|Portable Network Graphics'+
+                               ' (*.png)|*.png|JPEG Image File (*.jpg)|*.jpg|JPEG Image File (*.jpeg)|*.jpeg|Bitmaps (*.bmp)|'+
+                               '*.bmp|Icons (*.ico)|*.ico|Enhanced Metafiles (*.emf)|*.emf|Metafiles (*.wmf)|*.wmf|TIFF Images'+
+                               ' (*.tif)|*.tif|TIFF Images (*.tiff)|*.tiff';
+  if OpenPictureDialog1.Execute then begin
+    Edit3.Text := OpenPictureDialog1.FileName;
   end;
 end;
 
@@ -205,6 +380,9 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  DataInputSearchXPath := '';
+  DataInputMessageXPath := '';
+
   FWD := CreateWebDriver;
   FWD.GetURL('https://web.whatsapp.com/');
 

@@ -69,19 +69,21 @@ object frmMain: TfrmMain
       Left = 1
       Top = 1
       Width = 727
-      Height = 295
+      Height = 264
       Align = alClient
       ScrollBars = ssVertical
       TabOrder = 1
       WordWrap = False
+      ExplicitHeight = 295
     end
     object Panel3: TPanel
       Left = 1
-      Top = 296
+      Top = 265
       Width = 727
-      Height = 98
+      Height = 129
       Align = alBottom
       TabOrder = 2
+      ExplicitTop = 271
       object Label6: TLabel
         Left = 23
         Top = 16
@@ -91,14 +93,21 @@ object frmMain: TfrmMain
       end
       object Label7: TLabel
         Left = 23
-        Top = 48
+        Top = 43
         Width = 29
         Height = 13
         Caption = 'Pesan'
       end
+      object Label1: TLabel
+        Left = 23
+        Top = 70
+        Width = 30
+        Height = 13
+        Caption = 'Image'
+      end
       object Button6: TButton
         Left = 112
-        Top = 67
+        Top = 98
         Width = 75
         Height = 25
         Caption = 'Kirim'
@@ -119,6 +128,22 @@ object frmMain: TfrmMain
         Height = 21
         TabOrder = 2
       end
+      object Edit3: TEdit
+        Left = 112
+        Top = 67
+        Width = 441
+        Height = 21
+        TabOrder = 3
+      end
+      object Button1: TButton
+        Left = 558
+        Top = 65
+        Width = 27
+        Height = 25
+        Caption = '...'
+        TabOrder = 4
+        OnClick = Button1Click
+      end
     end
   end
   object Timer2: TTimer
@@ -126,5 +151,9 @@ object frmMain: TfrmMain
     OnTimer = Timer2Timer
     Left = 16
     Top = 73
+  end
+  object OpenPictureDialog1: TOpenPictureDialog
+    Left = 545
+    Top = 186
   end
 end
