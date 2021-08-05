@@ -3,14 +3,14 @@
 	<Transactions>
     <Transaction>2021/03/30 07:35:31.000.582,=C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
     <Transaction>2021/03/31 10:14:21.000.422,=C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
-    <Transaction>2021/03/31 10:14:49.000.801,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\ufrmMain.pas=C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
-    <Transaction>2021/03/31 10:14:49.000.801,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\ufrmMain.dfm=C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.dfm</Transaction>
-    <Transaction>2021/03/31 10:15:06.000.230,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\MutasiMandiriMCM2.dproj=C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Project3.dproj</Transaction>
+    <Transaction>2021/03/31 10:14:49.000.801,C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.pas=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\ufrmMain.pas</Transaction>
+    <Transaction>2021/03/31 10:14:49.000.801,C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Unit4.dfm=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\ufrmMain.dfm</Transaction>
+    <Transaction>2021/03/31 10:15:06.000.230,C:\Users\ISNU\Documents\Embarcadero\Studio\Projects\Project3.dproj=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103\MutasiMandiriMCM2.dproj</Transaction>
     <Transaction>2021/04/16 11:18:40.000.928,=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\Unit1.pas</Transaction>
-    <Transaction>2021/04/16 11:19:20.000.608,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\Unit1.pas=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\ufrmSetting.pas</Transaction>
-    <Transaction>2021/04/16 11:19:20.000.608,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\Unit1.dfm=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\ufrmSetting.dfm</Transaction>
-    <Transaction>2021/06/29 11:37:37.000.137,E:\Mutasi Mandiri MCM2 DXE103 V2\MutasiMandiriMCM2.dproj=E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsApp4Delphi.dproj</Transaction>
-    <Transaction>2021/06/29 11:37:56.000.781,E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsApp4Delphi.dproj=E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsappGateway4Delphi.dproj</Transaction>
+    <Transaction>2021/04/16 11:19:20.000.608,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\ufrmSetting.dfm=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\Unit1.dfm</Transaction>
+    <Transaction>2021/04/16 11:19:20.000.608,D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\ufrmSetting.pas=D:\Development\Mutasi Rekening\Mutasi Mandiri MCM2 DXE103 V2\Unit1.pas</Transaction>
+    <Transaction>2021/06/29 11:37:37.000.137,E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsApp4Delphi.dproj=E:\Mutasi Mandiri MCM2 DXE103 V2\MutasiMandiriMCM2.dproj</Transaction>
+    <Transaction>2021/06/29 11:37:56.000.781,E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsappGateway4Delphi.dproj=E:\Mutasi Mandiri MCM2 DXE103 V2\WhatsApp4Delphi.dproj</Transaction>
     <Transaction>2021/07/04 13:58:09.000.983,E:\Mutasi Mandiri MCM2 DXE103 V2\ufrmSetting.pas=</Transaction>
   </Transactions>
 	<ActiveMobileDevice>

@@ -74,7 +74,6 @@ object frmMain: TfrmMain
       ScrollBars = ssVertical
       TabOrder = 1
       WordWrap = False
-      ExplicitHeight = 295
     end
     object Panel3: TPanel
       Left = 1
@@ -83,7 +82,6 @@ object frmMain: TfrmMain
       Height = 129
       Align = alBottom
       TabOrder = 2
-      ExplicitTop = 271
       object Label6: TLabel
         Left = 23
         Top = 16

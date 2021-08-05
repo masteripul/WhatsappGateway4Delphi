@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Webdriver4D, iniFiles,
-  Vcl.ExtDlgs;
+  Vcl.ExtDlgs, MSHTML;
 
 type
   TfrmMain = class(TForm)
@@ -42,6 +42,7 @@ type
     procedure GetDataInputSearchXPath;
     procedure GetDataInputMessageXPath;
     procedure TypeMessage(Msg: string);
+    function StripHTML(S: string): string;
   public
     { Public declarations }
   end;
@@ -107,11 +108,38 @@ begin
   end;
 end;
 
+function TfrmMain.StripHTML(S: string): string;
+var
+  doc: OleVariant;
+  el: OleVariant;
+  i: Integer;
+
+  TS: TStringList;
+begin
+  TS := TStringList.Create;
+  doc := coHTMLDocument.Create as IHTMLDocument2;
+
+  TS.Clear;
+
+  S := StringReplace(S, #10, '''#A''',[rfReplaceAll, rfIgnoreCase]);
+
+  doc.write(S);
+  doc.close;
+
+  el := doc.body.all.item(0);
+  if (el.tagName = 'DIV')  then
+    TS.Add(el.outerText);
+
+  Result := TS.Text;
+
+  TS.Free;
+end;
+
 procedure TfrmMain.Timer2Timer(Sender: TObject);
 var
   FcurElement: TWebElement;
   StrA: string;
-  lst: TStringList;
+  lst, TStrA: TStringList;
   i: Integer;
 
   Pengirim,
@@ -126,54 +154,85 @@ begin
     lst           := TStringList.Create;
     lst.LineBreak := 'tabindex="-1"';
     lst.Text      := FcurElement.AttributeValue('innerHTML');
-    //memLog.Text   := FcurElement.AttributeValue('innerHTML');
-    //lst.Text      := FcurElement.GetAttribute;
 
     for i := 2 to lst.Count-1 do begin
       Pesan     := '';
       Waktu     := '';
       StatusPesan :=  '';
 
-      StrA      := lst.Strings[i];
-      StrA      := Copy(StrA,Pos('title="',StrA),MaxInt);
-      StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
+      StrA      := StripHTML(lst.Strings[i]);
+      TStrA     := TStringList.Create;
 
-      Pengirim  := Copy(StrA,1,Pos('<',StrA)-1);
-      Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll,rfIgnoreCase]);
-      Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll,rfIgnoreCase]);
-      Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll,rfIgnoreCase]);
-
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-      StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
-
-      Waktu     := Copy(StrA,1,Pos('<',StrA)-1);
-
-      if Pos('"status-image"',StrA) <> 0 then begin
+      try
+        TStrA.Text  := StrA;
+        if TStrA.Count = 5 then begin
+          Pengirim  := TStrA.Strings[1];
+          Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll, rfIgnoreCase]);
+          Waktu     := TStrA.Strings[2];
+          Pesan     := StringReplace(TStrA.Strings[3],'''''#A''''', #13#10,[rfReplaceAll, rfIgnoreCase]);
+          Pesan     := StringReplace(TStrA.Strings[3],'''#A''', #13#10,[rfReplaceAll, rfIgnoreCase]);
+          StatusPesan := TStrA.Strings[4];
+        end
+        else begin
+          Pengirim  := TStrA.Strings[1];
+          Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll, rfIgnoreCase]);
+          Waktu     := TStrA.Strings[2];
+          Pesan     := StringReplace(TStrA.Strings[3],'''''#A''''', #13#10,[rfReplaceAll, rfIgnoreCase]);
+          Pesan     := StringReplace(TStrA.Strings[3],'''#A''', #13#10,[rfReplaceAll, rfIgnoreCase]);
+          StatusPesan := '';
+        end;
+      except
+        Pengirim  := '';
+        Waktu     := '';
         Pesan     := '';
-      end
-      else begin
-        StrA      := Copy(StrA,Pos('title=',StrA),MaxInt);
-        StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
-        StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
-
-        Pesan     := Copy(StrA,1,Pos('</span>',StrA)-1);
-      end;
-
-      if Pos('unread message',StrA) <> 0 then begin
-        StrA      := Copy(StrA,Pos('</span>',StrA)+7,MaxInt);
-        StrA      := Copy(StrA,Pos('unread message',StrA)+7,MaxInt);
-        StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
-
-        StatusPesan   := Copy(StrA,1,Pos('<',StrA)-1);
-      end
-      else begin
         StatusPesan := '';
       end;
+
+      TStrA.Free;
+
+//      StrA      := Copy(StrA,Pos('title="',StrA),MaxInt);
+//      StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
+//
+//      Pengirim  := Copy(StrA,1,Pos('<',StrA)-1);
+//      Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll,rfIgnoreCase]);
+//      Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll,rfIgnoreCase]);
+//      Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll,rfIgnoreCase]);
+//
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//      StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
+//
+//      Waktu     := Copy(StrA,1,Pos('<',StrA)-1);
+//
+//      if Pos('"status-image"',StrA) <> 0 then begin
+//        Pesan     := '';
+//      end
+//      else begin
+//        StrA      := Copy(StrA,Pos('title=',StrA),MaxInt);
+//        StrA      := Copy(StrA,Pos('<',StrA)+1,MaxInt);
+//        StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
+//
+//        Pesan     := Copy(StrA,1,Pos('</span>',StrA)-1);
+//      end;
+//
+//      if Pos('unread message',StrA) <> 0 then begin
+//        StrA      := Copy(StrA,Pos('</span>',StrA)+7,MaxInt);
+//        StrA      := Copy(StrA,Pos('unread message',StrA)+7,MaxInt);
+//        StrA      := Copy(StrA,Pos('>',StrA)+1,MaxInt);
+//
+//        StatusPesan   := Copy(StrA,1,Pos('<',StrA)-1);
+//      end
+//      else begin
+//        StatusPesan := '';
+//      end;
 
       // click posisi pesan
       if StatusPesan <> '' then begin
