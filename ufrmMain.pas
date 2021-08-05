@@ -135,6 +135,48 @@ begin
   TS.Free;
 end;
 
+function GetNumberPhone(aStr, Phone: string) : string;
+var
+  doc: OleVariant;
+  el: OleVariant;
+  i: Integer;
+  j: Int64;
+  Buff: string;
+begin
+  if TryStrToInt64(Phone,j) then begin
+    Result := Phone;
+    Exit;
+  end;
+  
+
+  doc := coHTMLDocument.Create as IHTMLDocument2;
+  doc.write(aStr);
+  doc.close;
+
+  Buff := '';
+
+  for i := 0 to doc.body.all.length-1 do
+  begin
+    el := doc.body.all.item(i);
+    if (el.tagName = 'IMG')  then begin
+      Buff := el.outerHTML;
+      Break;
+    end;
+  end;
+
+  if Buff <> '' then begin
+    Buff := Copy(Buff,Pos('src="',Buff)+5,MaxInt);
+    Buff := Copy(Buff,1, Pos('"',Buff));
+    Buff := Copy(Buff,Pos('s&amp;u=',Buff)+8,MaxInt);
+    Buff := Copy(Buff,1, Pos('%40c',Buff)-1);
+  end
+  else begin
+    Buff := Phone;
+  end;
+
+  Result := Buff;
+end;
+
 procedure TfrmMain.Timer2Timer(Sender: TObject);
 var
   FcurElement: TWebElement;
@@ -156,6 +198,7 @@ begin
     lst.Text      := FcurElement.AttributeValue('innerHTML');
 
     for i := 2 to lst.Count-1 do begin
+      Pengirim  := '';
       Pesan     := '';
       Waktu     := '';
       StatusPesan :=  '';
@@ -170,6 +213,7 @@ begin
           Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll, rfIgnoreCase]);
           Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll, rfIgnoreCase]);
           Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := GetNumberPhone(lst.Strings[i], Pengirim);
           Waktu     := TStrA.Strings[2];
           Pesan     := StringReplace(TStrA.Strings[3],'''''#A''''', #13#10,[rfReplaceAll, rfIgnoreCase]);
           Pesan     := StringReplace(TStrA.Strings[3],'''#A''', #13#10,[rfReplaceAll, rfIgnoreCase]);
@@ -180,16 +224,13 @@ begin
           Pengirim  := StringReplace(Pengirim,' ','',[rfReplaceAll, rfIgnoreCase]);
           Pengirim  := StringReplace(Pengirim,'-','',[rfReplaceAll, rfIgnoreCase]);
           Pengirim  := StringReplace(Pengirim,'+','',[rfReplaceAll, rfIgnoreCase]);
+          Pengirim  := GetNumberPhone(lst.Strings[i], Pengirim);
           Waktu     := TStrA.Strings[2];
           Pesan     := StringReplace(TStrA.Strings[3],'''''#A''''', #13#10,[rfReplaceAll, rfIgnoreCase]);
           Pesan     := StringReplace(TStrA.Strings[3],'''#A''', #13#10,[rfReplaceAll, rfIgnoreCase]);
           StatusPesan := '';
         end;
       except
-        Pengirim  := '';
-        Waktu     := '';
-        Pesan     := '';
-        StatusPesan := '';
       end;
 
       TStrA.Free;
